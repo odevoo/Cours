@@ -274,3 +274,67 @@ mysqldump -h localhost -u root --password= leperray > leperray.sql
 
 OPTIMIZE TABLE 
 REPAIR TABLE
+
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+TRIGGER:
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_client BEFORE INSERT
+ON clients FOR EACH ROW
+BEGIN
+    SET NEW.datecrea = NOW();
+    SET NEW.datemodif = NOW();
+
+END $$
+DELIMITER ;
+
+
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER before_update_client BEFORE UPDATE
+ON clients FOR EACH ROW
+BEGIN
+    SET NEW.datemodif = NOW();
+
+END $$
+DELIMITER ;
+
+
+
+INSERT INTO clients(nom, prenom) VALUES ('DURAND', 'Jean')
+
+
+
+
+UPDATE clients
+SET email = 'a@a.com'
+WHERE numclient = 4
+
+
+
+/*******************//*******************//*******************//*******************/
+
+trigger pour optimiser les base après chaque delete : !:!!!!!!! ne marche pas sur innoDB
+
+
+DELIMITER $$
+
+CREATE TRIGGER after_delete_client AFTER DELETE
+ON clients FOR EACH ROW
+BEGIN
+    OPTIMIZE TABLE clients;
+
+END $$
+DELIMITER ;
