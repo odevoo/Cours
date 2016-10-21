@@ -1,0 +1,276 @@
+
+
+/*******************//*******************//*******************//*******************/
+
+Jointure:
+
+
+SELECT c.numfacture, c.codearticle, a.designation, c.quantite
+FROM commandes c
+JOIN articles a
+ON c.codearticle = a.codearticle
+WHERE c.numfacture = 1
+ORDER BY a.designation ASC
+
+
+/*******************//*******************//*******************//*******************/
+
+
+Jointure optionelle
+
+
+SELECT c.nom, c.prenom, f.numfacture 
+FROM clients c 
+LEFT JOIN factures f
+ON c.numclient = f.numclient
+
+/*******************//*******************//*******************//*******************/
+
+Deux jointure 
+
+SELECT c.nom, c.prenom, f.numfacture r.libelle
+FROM clients c 
+JOIN factures f
+ON c.numclient = f.numclient
+JOIN reglements r
+ON r.idreglement = f.modereglement
+
+
+/*******************//*******************//*******************//*******************/
+
+Création d'un export CSV
+
+SELECT 'Code Article', 'Désignation', 'PU HT', 'Quantité Stock'
+SELECT codearticle, designation, puht, quantitestock
+INTO OUTFILE 'c:/xampp/htdocs/articles.csv'
+CHARACTER SET 'latin1'
+FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '' LINES TERMINATED BY '\n'
+FROM articles
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+LOAD DATA INFILE 'c:/xampp/htdocs/articles.csv'
+INTO TABLE articles
+CHARACTER SET 'latin1'
+FIELDS TERMINATED BY ';' ENCLOSED BY '' ESCAPED BY ''
+IGNORE 1 LINES
+
+
+/*******************//*******************//*******************//*******************/
+
+CREATION DE VUE
+
+
+
+CREATE VIEW commandeAvecDesignation AS
+SELECT c.numfacture, c.codearticle, a.designation, c.quantite
+FROM commandes c
+JOIN articles a
+ON c.codearticle = a.codearticle
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+SELECT codearticle, designation, MAX(PUHT) as alias FROM articles
+
+
+
+MAX MIN AVG SUM
+
+
+
+
+SELECT count(*) FROM artciles           ===> compte le nombre d'article 
+
+
+
+
+SELECT CONCAT('Article', codearticle) as article, designation, puht, quantitestock  FROM articles
+
+
+/*******************//*******************//*******************//*******************/
+
+Creation FUNCTION marge
+
+
+
+DELIMITER $$
+CREATE FUNCTION marge(puht DECIMAL(6,2))
+RETURNS DECIMAL(6,2)
+BEGIN
+RETURN puht * 1.5;
+END$$
+DELIMITER ;
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+UTILISATION fonction:
+
+
+
+SELECT codearticle, designation, puht, marge(puht) as ppht, quantitestock FROM articles
+
+
+/*******************//*******************//*******************//*******************/
+
+CREATION TABLE TEMPORAIRE
+
+
+CREATE TEMPORARY TABLE poubelle(
+    codearticle INT PRIMARY KEY,
+    designation VARCHAR(30),
+    puht DECIMAL(6,2),
+    ppht DECIMAL(6,2)
+ );
+
+
+CREATE TEMPORARY TABLE poubelle(
+    codearticle INT,
+    designation VARCHAR(30),
+    puht DECIMAL(6,2),
+    ppht DECIMAL(6,2)
+ );
+ 
+ INSERT INTO poubelle
+ 	(SELECT codearticle, designation, puht, marge(puht) FROM articles);
+    
+SELECT * FROM poubelle;
+
+
+
+CREATE TEMPORARY TABLE poubelle(
+    codearticle INT,
+    designation VARCHAR(30),
+    puht DECIMAL(6,2),
+    ppht DECIMAL(6,2)
+ );
+ 
+ INSERT INTO poubelle
+ 	(SELECT codearticle, designation, puht, marge(puht) FROM articles);
+    
+SELECT * 
+INTO OUTFILE 'c:/xampp/htdocs/poubelle.csv'
+CHARACTER SET 'latin1'
+FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '' LINES TERMINATED BY '\n'
+FROM poubelle
+
+
+/*******************//*******************//*******************//*******************/
+
+création lien 
+
+alter table factures
+ADD FOREIGN KEY (numclient) references clients(numclients)
+on update CASCADE
+on DELETE CASCADE
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+TRANSACTION
+
+/* l'autocommit est actif par default */
+SET AUTOCOMMIT = 0;
+/*on demarre une transaction...*/
+START TRANSACTION;
+    UPDATE articles
+    SET designation = 'oups';
+    /*j'annule mon erreur*/
+    ROLLBACK;         
+
+
+ On remplace ROLLBACK par COMMIT si on veut executer la transaction
+
+
+/*******************//*******************//*******************//*******************/
+
+supprimer une table  
+
+
+TRUNCATE TABLE commandes
+
+
+TRUNCATE reinitialise l'autoincrement
+
+
+/*******************//*******************//*******************//*******************/
+
+
+PRcodédure stockée:
+
+
+/* Procedure stockée*/
+DELIMITER $$
+
+/* designation de la procedure*/
+CREATE PROCEDURE maProcedure(IN idArticles INT)
+
+BEGIN
+    SELECT * FROM articles
+    WHERE codearticle = idArticles;
+
+END $$
+DELIMITER ;
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+/* Procedure stockée*/
+DELIMITER $$
+
+/* designation de la procedure*/
+CREATE PROCEDURE export()
+
+BEGIN
+   CREATE TEMPORARY TABLE poubelle(
+    codearticle INT,
+    designation VARCHAR(30),
+    puht DECIMAL(6,2),
+    ppht DECIMAL(6,2));
+ 
+ INSERT INTO poubelle
+ SELECT codearticle, designation, puht, marge(puht)
+ FROM articles;
+    
+SELECT 'Code Article', 'Designation', 'Prix unitaire', 'Prix Public'
+UNION
+SELECT codearticle, designation, puht, ppht
+INTO OUTFILE 'c:/xampp/htdocs/poubelle.csv'
+CHARACTER SET 'latin1'
+FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '' LINES TERMINATED BY '\n'
+FROM poubelle;
+
+
+END $$
+DELIMITER ;
+
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+
+C:\xampp\mysql\bin>mysql -h localhost -u root -p
+
+
+mysqldump -h localhost -u root --password= leperray > leperray.sql
+
+
+OPTIMIZE TABLE 
+REPAIR TABLE
