@@ -338,3 +338,38 @@ BEGIN
 
 END $$
 DELIMITER ;
+
+
+
+
+/*******************//*******************//*******************//*******************/
+
+
+SHOW GLOBAL VARIABLES LIKE 'event_scheduler'
+
+
+
+
+SET GLOBAL event_scheduler = 1;
+
+
+
+Creation EVENT:
+
+
+
+
+
+DELIMITER $$
+
+CREATE EVENT maintenance
+ON SCHEDULE EVERY 24 HOUR
+DO BEGIN
+    OPTIMIZE TABLE leperray.articles;
+    OPTIMIZE TABLE leperray.clients;
+    OPTIMIZE TABLE leperray.commandes;
+    OPTIMIZE TABLE leperray.factures;
+    OPTIMIZE TABLE leperray.reglements;
+    
+    END $$
+    DELIMITER ;
