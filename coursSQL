@@ -1,4 +1,5 @@
-
+SLACK COMMUNITY:
+http://techbeacon.com/46-slack-groups-developers
 
 /*******************//*******************//*******************//*******************/
 
@@ -19,17 +20,17 @@ ORDER BY a.designation ASC
 Jointure optionelle
 
 
-SELECT c.nom, c.prenom, f.numfacture 
-FROM clients c 
+SELECT c.nom, c.prenom, f.numfacture
+FROM clients c
 LEFT JOIN factures f
 ON c.numclient = f.numclient
 
 /*******************//*******************//*******************//*******************/
 
-Deux jointure 
+Deux jointure
 
 SELECT c.nom, c.prenom, f.numfacture r.libelle
-FROM clients c 
+FROM clients c
 JOIN factures f
 ON c.numclient = f.numclient
 JOIN reglements r
@@ -85,7 +86,7 @@ MAX MIN AVG SUM
 
 
 
-SELECT count(*) FROM artciles           ===> compte le nombre d'article 
+SELECT count(*) FROM artciles           ===> compte le nombre d'article
 
 
 
@@ -139,10 +140,10 @@ CREATE TEMPORARY TABLE poubelle(
     puht DECIMAL(6,2),
     ppht DECIMAL(6,2)
  );
- 
+
  INSERT INTO poubelle
  	(SELECT codearticle, designation, puht, marge(puht) FROM articles);
-    
+
 SELECT * FROM poubelle;
 
 
@@ -153,11 +154,11 @@ CREATE TEMPORARY TABLE poubelle(
     puht DECIMAL(6,2),
     ppht DECIMAL(6,2)
  );
- 
+
  INSERT INTO poubelle
  	(SELECT codearticle, designation, puht, marge(puht) FROM articles);
-    
-SELECT * 
+
+SELECT *
 INTO OUTFILE 'c:/xampp/htdocs/poubelle.csv'
 CHARACTER SET 'latin1'
 FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '' LINES TERMINATED BY '\n'
@@ -166,7 +167,7 @@ FROM poubelle
 
 /*******************//*******************//*******************//*******************/
 
-création lien 
+création lien
 
 alter table factures
 ADD FOREIGN KEY (numclient) references clients(numclients)
@@ -188,7 +189,7 @@ START TRANSACTION;
     UPDATE articles
     SET designation = 'oups';
     /*j'annule mon erreur*/
-    ROLLBACK;         
+    ROLLBACK;
 
 
  On remplace ROLLBACK par COMMIT si on veut executer la transaction
@@ -196,7 +197,7 @@ START TRANSACTION;
 
 /*******************//*******************//*******************//*******************/
 
-supprimer une table  
+supprimer une table
 
 
 TRUNCATE TABLE commandes
@@ -242,11 +243,11 @@ BEGIN
     designation VARCHAR(30),
     puht DECIMAL(6,2),
     ppht DECIMAL(6,2));
- 
+
  INSERT INTO poubelle
  SELECT codearticle, designation, puht, marge(puht)
  FROM articles;
-    
+
 SELECT 'Code Article', 'Designation', 'Prix unitaire', 'Prix Public'
 UNION
 SELECT codearticle, designation, puht, ppht
@@ -272,7 +273,7 @@ C:\xampp\mysql\bin>mysql -h localhost -u root -p
 mysqldump -h localhost -u root --password= leperray > leperray.sql
 
 
-OPTIMIZE TABLE 
+OPTIMIZE TABLE
 REPAIR TABLE
 
 
@@ -370,6 +371,6 @@ DO BEGIN
     OPTIMIZE TABLE leperray.commandes;
     OPTIMIZE TABLE leperray.factures;
     OPTIMIZE TABLE leperray.reglements;
-    
+
     END $$
     DELIMITER ;
